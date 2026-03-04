@@ -1,67 +1,85 @@
-# Router UPS Circuit (STM8S + 2S Li-ion)
+# Router UPS Circuit (With MOSFET + STM8S Module)
 
-## 1) Power Architecture
+## KiCad-Style Diagram
+
+![STM8 Router UPS KiCad-style schematic](./circuit_kicad_style.svg)
+
+## 1) Full Circuit Topology
 
 ```text
-                    +------------------------ Router 12V OUT (+)
-                    | 
-12V Adapter (+) ---+----> D1 (Schottky/ideal diode) -------+
-                    |                                       |
-                    +----> 2S Charger (8.4V CC/CV) ----+    |
-                                                       |    |
-2S Battery Pack (+) -> 2S BMS -> Boost 12V -> D2 -----+----+
+                           +---------------------------> Router (+)
+                           |                UPS_12V_OUT
+12V Adapter (+) ---+-----> Q1 P-MOS (ideal-diode OR) -----------+
+                   |                                              |
+                   +-----> 2S Charger 8.4V (CC/CV)               |
+                                |                                 |
+                                +-------> BMS P+                  |
+Battery 2S pack <---- BMS B+/B-         BMS P- ------------------+---- GND
+                                |
+                                +--> Fuse --> Q3 P-MOS switch --> Boost IN+
+                                                   (STM8 control)   Boost GND -> GND
+Boost OUT 12V --------------------------------> Q2 P-MOS (ideal-diode OR) --+
+                                                                              |
+                                                                              +--> UPS_12V_OUT
 
-All grounds are common:
-Adapter (-), Charger GND, BMS GND, Boost GND, STM8 GND, Router GND
+UPS_12V_OUT -> 5V/3.3V regulator -> STM8S VCC
+GND ------------------------------------------> STM8S GND
 ```
 
-- `D1` and `D2` perform power-path OR-ing so the higher source feeds output.
-- Prefer ideal-diode modules for lower voltage drop than Schottky.
+MOSFET roles:
+- `Q1`: adapter path ideal-diode MOSFET (prevents reverse current).
+- `Q2`: boost path ideal-diode MOSFET (prevents backfeed into boost).
+- `Q3`: battery-to-boost high-side switch MOSFET controlled by STM8.
 
-## 2) STM8S Connections
+## 2) STM8S103 Module Block
 
-Assumed MCU: STM8S103F3P6 dev board.
+```text
+                 +----------------------+
+                 |      STM8S103        |
+Adapter detect ->| PB4              VCC |<- 5V/3.3V regulator
+Battery ADC ---->| PD2/AIN2         GND |-> Common GND
+Boost control -->| PD3                  |
+Buzzer drive ----| PD4                  |
+Status LED ------| PC5                  |
+                 +----------------------+
+```
 
-- `PB4`  : Mains present detect input (HIGH when adapter present)
-- `PD3`  : Boost enable output (to converter `EN` pin)
-- `PD4`  : Buzzer output (optional, via transistor if needed)
-- `PC5`  : Status LED output
-- `PD2/AIN2` : Battery voltage ADC input via divider
+Control connections:
+- `PD3` -> gate-driver transistor/resistor network for `Q3` and/or boost `EN`.
+- `PD4` -> buzzer (direct small buzzer or via N-MOS driver).
+- `PC5` -> LED + resistor.
 
-## 3) Battery Voltage Divider (for PD2/AIN2)
+## 3) Battery Sense Divider (PD2/AIN2)
 
-Use:
-- `Rtop = 100k` from battery+ to `PD2`
-- `Rbot = 33k` from `PD2` to GND
+- `Rtop = 100k`: `BMS P+` to `PD2`
+- `Rbot = 33k`: `PD2` to GND
+- Optional `100nF` from `PD2` to GND for filtering
 
-This scales max 8.4V battery into ADC-safe range (~2.08V).
+At 8.4V battery, ADC input is about 2.08V.
 
-## 4) Mains Presence Detection
+## 4) Adapter-Present Detect (PB4)
 
-### Option A (recommended): optocoupler
-- Drive optocoupler LED from adapter side with resistor.
-- Transistor output pulls `PB4` high/low with pull-up/down logic.
-- Gives isolation from adapter noise.
+- Use optocoupler or divider+transistor from adapter 12V to logic-level PB4.
+- Ensure PB4 never exceeds MCU input voltage rating.
 
-### Option B: transistor divider
-- Simple NPN + resistor network from adapter 12V to logic level for `PB4`.
-- Ensure `PB4` never exceeds 3.3V/5V logic level of your dev board.
+Simple divider:
+- `100k` from adapter +12V to PB4
+- `33k` from PB4 to GND
 
-## 5) Firmware Behavior (already implemented)
+## 5) Firmware Behavior (Matches This Diagram)
 
-- If mains present: boost OFF, LED ON
-- If mains missing and battery above cutoff: boost ON
-- If battery below cutoff: boost OFF + buzzer alert
-- Recovery hysteresis prevents rapid toggling
+- Adapter present: `Q3` OFF / boost OFF, router fed via `Q1`.
+- Adapter missing: enable boost path (`Q3` ON and boost EN ON) if battery above cutoff.
+- Battery low: disable boost path and alarm; recover only above hysteresis threshold.
 
-Thresholds are in `inc/config.h`:
-- `BATT_CUTOFF_MV` (default 6400mV)
-- `BATT_RECOVER_MV` (default 7000mV)
+Thresholds in `inc/config.h`:
+- `BATT_CUTOFF_MV = 6400`
+- `BATT_RECOVER_MV = 7000`
 
-## 6) Safety Notes
+## 6) Wiring Safety Checklist
 
-- Use matched 18650 cells in good condition.
-- 2S BMS is mandatory.
-- Add fuse on battery positive line.
-- Verify router current draw and size adapter/boost with margin.
-- Test cutoff/recovery thresholds with a bench supply before live use.
+- Verify BMS mapping: `B+/B-` to cells, `P+/P-` to charger/load.
+- Add battery fuse before boost input.
+- Confirm MOSFET orientation (`source`, `drain`, `body diode` direction).
+- Set boost output to router voltage before connecting router.
+- Validate switchover with a dummy load first.

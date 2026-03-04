@@ -6,7 +6,10 @@
 - 2S Li-ion BMS board, continuous current >= router load (1x)
 - 2S charger module (8.4V CC/CV), input 12V (1x)
 - Boost converter 6V-8.4V to 12V, >=2A recommended (1x)
-- Schottky diodes 3A+ (2x) or ideal-diode power-path modules (2x)
+- P-channel MOSFET for adapter ideal-diode path `Q1` (1x)
+- P-channel MOSFET for boost ideal-diode path `Q2` (1x)
+- P-channel MOSFET for battery-to-boost switch `Q3` (1x)
+- Small NPN/N-MOS gate driver for Q3 gate control from STM8 `PD3` (1x)
 - 18650 cells (2x, same model/capacity/age)
 - Cell holder for 2S pack or welded pack (1x)
 
@@ -24,13 +27,14 @@
 - Inline fuse holder + fuse (battery positive) (1x)
 - Terminal blocks / screw connectors (as required)
 - Wires rated for expected current
+- Gate resistors/pull-ups for MOSFET control network (as required)
 
 ## 4) STM8 Pin Mapping Table
 
 | Function | STM8 Pin | Direction | Connected To |
 |---|---|---|---|
 | Mains present | PB4 | Input | Optocoupler/transistor output |
-| Boost enable | PD3 | Output | Boost converter `EN` |
+| Boost/MOSFET control | PD3 | Output | Q3 gate driver and/or boost `EN` |
 | Buzzer | PD4 | Output | Buzzer input/driver |
 | Status LED | PC5 | Output | LED + resistor |
 | Battery ADC | PD2 / AIN2 | Input (ADC) | Divider midpoint (100k/33k) |
@@ -48,6 +52,6 @@
 - Confirm common ground across all modules.
 - Confirm battery polarity and BMS wiring.
 - Confirm divider output at ADC pin is < MCU analog max.
-- Confirm OR-ing diodes orientation.
+- Confirm MOSFET source/drain orientation and body diode direction.
 - Confirm boost output is regulated to router requirement.
 - Test no-load then dummy-load before router.
