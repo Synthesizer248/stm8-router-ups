@@ -1,5 +1,13 @@
-# Build outputs
+# Arduino build outputs
 build/
+*.hex
+*.elf
+*.lst
+*.eep
+
+# Arduino IDE metadata
+.arduinoIDE/
+*.ino.eep
 
 # VS Code
 .vscode/*.log

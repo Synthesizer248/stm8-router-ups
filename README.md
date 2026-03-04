@@ -1,54 +1,58 @@
-# STM8S Router UPS (VS Code + SDCC)
+# STM8 Router UPS (Arduino IDE + ST-Link V2)
 
-This is a minimal STM8S103F3 project for a router UPS controller.
+This repo now uses Arduino IDE workflow for STM8S boards.
+
+## Firmware File
+
+- Main sketch: `arduino_lipo_charger.ino`
 
 ## Features
-- Detect mains adapter presence (digital input)
-- Measure battery voltage (ADC)
-- Enable/disable boost converter (GPIO)
-- Low-battery cutoff protection with hysteresis
-- Status LED + buzzer alert
 
-## Target
-- MCU: STM8S103F3P6
-- Toolchain: SDCC
-- Flasher: stm8flash (with ST-Link)
+- Mains adapter detection
+- Battery voltage monitoring with ADC divider
+- Boost enable control for backup mode
+- Low-battery cutoff with hysteresis
+- Status LED and buzzer alert
 
-## Pin Map
-- `PB4` : Mains present input (HIGH = adapter present)
-- `PD3` : Boost enable output
-- `PD4` : Buzzer output
-- `PC5` : Status LED output
-- `AIN2 (PD2)` : Battery voltage sense (via 100k/33k divider)
+## Hardware Assumption
 
-## Hardware Notes
-- Use a 2S Li-ion pack with a proper 2S BMS.
-- Use a dedicated 8.4V CC/CV charger module.
-- Use a 12V boost converter for backup rail.
-- Divider for battery sense: 100k (top) + 33k (bottom).
+- MCU: STM8S103F3 (or compatible STM8S board)
+- Programmer: ST-Link V2
+- Power stage: 2S Li-ion + 2S BMS + 8.4V charger + 12V boost
 
-## VS Code Usage
-- `Terminal -> Run Task -> Build (SDCC)`
-- `Terminal -> Run Task -> Flash (ST-Link)`
-- `Terminal -> Run Task -> Build + Flash`
+## Arduino IDE Setup
 
-## CLI Usage (PowerShell)
-```powershell
-./scripts_build.ps1
-./scripts_flash.ps1
-```
+1. Install Arduino IDE 2.x.
+2. Open `File -> Preferences`.
+3. Add this Boards Manager URL:
+   `https://raw.githubusercontent.com/tenbaht/sduino/master/package_sduino_stm8_index.json`
+4. Open `Tools -> Board -> Boards Manager`, install STM8 core package.
+5. Open sketch file `arduino_lipo_charger.ino`.
+6. In `Tools`, select your STM8 board (example: `STM8S103F3P6`).
+7. Select programmer as ST-Link V2 (name may appear as `STLink`, `STLinkV2`, or similar).
+8. Use `Sketch -> Upload Using Programmer` (Ctrl+Shift+U).
 
-## Optional Makefile Usage
-```powershell
-make
-make flash
-make clean
-```
+## ST-Link Wiring
 
-## Adjustments
-Edit thresholds in `inc/config.h`:
-- `BATT_CUTOFF_MV`
-- `BATT_RECOVER_MV`
-- `MAIN_LOOP_DELAY_MS`
+- ST-Link `SWIM` -> STM8 `SWIM`
+- ST-Link `GND` -> STM8 `GND`
+- ST-Link `3V3/5V` -> target VCC (as required by board)
+- Optional: ST-Link `RST` -> STM8 `NRST`
 
-If your board differs (STM8S003 etc.), update `MCU` in `Makefile` and flash target accordingly.
+## Pin Mapping In Sketch
+
+- `PB4`: mains detect input
+- `PD3`: boost enable / Q3 gate driver control
+- `PD4`: buzzer output
+- `PC5`: status LED output
+- `A2` or `PD2`: battery ADC input
+
+If your board mapping differs, edit pin constants at the top of `arduino_lipo_charger.ino`.
+
+## Threshold Tuning
+
+Edit values in sketch:
+
+- `BATT_CUTOFF_MV` (default `6400`)
+- `BATT_RECOVER_MV` (default `7000`)
+- `LOOP_DELAY_MS`

@@ -72,7 +72,7 @@ Simple divider:
 - Adapter missing: enable boost path (`Q3` ON and boost EN ON) if battery above cutoff.
 - Battery low: disable boost path and alarm; recover only above hysteresis threshold.
 
-Thresholds in `inc/config.h`:
+Thresholds in `arduino_lipo_charger.ino`:
 - `BATT_CUTOFF_MV = 6400`
 - `BATT_RECOVER_MV = 7000`
 
