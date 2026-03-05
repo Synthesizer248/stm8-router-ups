@@ -1,0 +1,82 @@
+(kicad_pcb
+  (version 20240108)
+  (generator "manual")
+
+  (general
+    (thickness 1.6)
+  )
+
+  (paper "A4")
+
+  (title_block
+    (title "Smart Solar Li-Po Charger")
+    (date "2026-03-06")
+    (rev "A0")
+    (company "Open Hardware Reference Design")
+  )
+
+  (layers
+    (0 "F.Cu" signal)
+    (31 "B.Cu" signal)
+    (32 "B.Adhes" user "B.Adhesive")
+    (33 "F.Adhes" user "F.Adhesive")
+    (34 "B.Paste" user)
+    (35 "F.Paste" user)
+    (36 "B.SilkS" user "B.Silkscreen")
+    (37 "F.SilkS" user "F.Silkscreen")
+    (38 "B.Mask" user)
+    (39 "F.Mask" user)
+    (40 "Dwgs.User" user "User.Drawings")
+    (41 "Cmts.User" user "User.Comments")
+    (42 "Eco1.User" user "User.Eco1")
+    (43 "Eco2.User" user "User.Eco2")
+    (44 "Edge.Cuts" user)
+    (45 "Margin" user)
+    (46 "B.CrtYd" user "B.Courtyard")
+    (47 "F.CrtYd" user "F.Courtyard")
+    (48 "B.Fab" user)
+    (49 "F.Fab" user)
+  )
+
+  (setup
+    (pad_to_mask_clearance 0)
+    (allow_soldermask_bridges_in_footprints no)
+    (aux_axis_origin 0 0)
+  )
+
+  (net 0 "")
+  (net 1 "GND")
+  (net 2 "SOLAR_IN")
+  (net 3 "VIN_FILT")
+  (net 4 "SW_NODE")
+  (net 5 "BAT_OUT")
+  (net 6 "PWM_GATE")
+  (net 7 "ADC_SOLAR")
+  (net 8 "ADC_BATT")
+  (net 9 "ADC_CURR")
+  (net 10 "SWIM")
+  (net 11 "NRST")
+  (net 12 "VCC")
+
+  (gr_rect
+    (start 20 20)
+    (end 70 60)
+    (stroke
+      (width 0.1)
+      (type solid)
+    )
+    (fill no)
+    (layer "Edge.Cuts")
+  )
+
+  (gr_text "Smart Solar Li-Po Charger"
+    (at 25 23 0)
+    (layer "F.SilkS")
+    (effects
+      (font
+        (size 1 1)
+        (thickness 0.15)
+      )
+    )
+  )
+)

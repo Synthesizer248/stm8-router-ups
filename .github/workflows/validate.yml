@@ -1,0 +1,25 @@
+name: Validate Repository
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  repo-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify required files exist
+        run: |
+          test -f README.md
+          test -f arduino_lipo_charger.ino
+          test -f hardware/bom/bom.csv
+          test -f hardware/schematic/smart_solar_lipo_charger_schematic.md
+          test -f hardware/pcb/smart_solar_lipo_charger_pcb.md
+          test -f Docs/programming_stlink.md
+
+      - name: Basic markdown link check (internal paths)
+        run: |
+          grep -R "\\](hardware/" README.md >/dev/null
