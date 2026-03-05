@@ -1,114 +1,58 @@
-# Smart Solar Li-Po Charging System (STM8S + STM8duino)
+# STM8 Router UPS (Arduino IDE + ST-Link V2)
 
-Open-source reference design for a microcontroller-controlled solar charger:
+This repo now uses Arduino IDE workflow for STM8S boards.
 
-- Solar panel input: `5V / 200mA` (about `1W`)
-- Battery: `1S 3.7V Li-Po`, charge limit `4.2V`
-- Controller: `STM8S103F3P6`
-- Firmware environment: Arduino IDE with STM8duino core
-- Programming: ST-LINK V2 over SWIM
+## Firmware File
 
-This repository includes firmware, circuit design, PCB design files, BOM, and bring-up/testing docs.
+- Main sketch: `arduino_lipo_charger.ino`
 
 ## Features
 
-- Solar voltage monitoring (`ADC`)
-- Battery voltage monitoring (`ADC`)
-- Optional current monitoring (`0.1 ohm` shunt + amplifier)
-- PWM buck-stage control
-- Li-Po safety state machine
-- Optional perturb-and-observe MPPT loop
+- Mains adapter detection
+- Battery voltage monitoring with ADC divider
+- Boost enable control for backup mode
+- Low-battery cutoff with hysteresis
+- Status LED and buzzer alert
 
-## Charging Modes
+## Hardware Assumption
 
-| Battery Voltage | Mode | Behavior |
-|---|---|---|
-| `< 3.2V` | Precharge | Low current target (`~40mA`) |
-| `3.2V to 4.1V` | Bulk/Normal | Higher current target (`~160mA`) |
-| `4.1V to 4.2V` | CV | Hold near `4.2V` |
-| `>= 4.2V` and low current | Done | PWM off |
-| `>= 4.25V` | Fault | PWM off (protection) |
+- MCU: STM8S103F3 (or compatible STM8S board)
+- Programmer: ST-Link V2
+- Power stage: 2S Li-ion + 2S BMS + 8.4V charger + 12V boost
 
-## Repository Layout
-
-```text
-.
-|-- arduino_lipo_charger.ino                      # Main firmware sketch
-|-- firmware/stm8_solar_mppt_charger/
-|   `-- stm8_solar_mppt_charger.ino              # Same firmware (folderized)
-|-- hardware/
-|   |-- bom/
-|   |   |-- bom.csv
-|   |   `-- bom.md
-|   |-- kicad/
-|   |   |-- smart_solar_lipo_charger.kicad_sch
-|   |   `-- smart_solar_lipo_charger.kicad_pcb
-|   |-- schematic/
-|   |   |-- smart_solar_lipo_charger_schematic.md
-|   |   |-- smart_solar_lipo_charger_netlist.csv
-|   |   `-- smart_solar_lipo_charger_schematic.svg
-|   |-- pcb/
-|   |   |-- smart_solar_lipo_charger_pcb.md
-|   |   |-- component_placement.csv
-|   |   `-- smart_solar_lipo_charger_pcb.svg
-|   `-- manufacturing/gerbers/
-|       `-- README.md
-|-- Docs/
-|   |-- architecture.md
-|   |-- firmware.md
-|   |-- hardware.md
-|   |-- mppt.md
-|   |-- programming_stlink.md
-|   |-- calibration.md
-|   `-- test_plan.md
-|-- LICENSE
-`-- LICENSE-HARDWARE.md
-```
-
-## Hardware Summary
-
-- Inductor: `22uH`
-- Input capacitor: `220uF`
-- Output capacitor: `470uF`
-- Schottky diode: `SS14`
-- Main switch MOSFET: `AO3400` (or equivalent logic-level MOSFET)
-- Current shunt: `0.1 ohm`
-- Voltage sense dividers for solar and battery ADC channels
-
-Detailed notes:
-
-- Schematic: [`hardware/schematic/smart_solar_lipo_charger_schematic.md`](hardware/schematic/smart_solar_lipo_charger_schematic.md)
-- PCB: [`hardware/pcb/smart_solar_lipo_charger_pcb.md`](hardware/pcb/smart_solar_lipo_charger_pcb.md)
-
-## Firmware Build/Flash (Arduino IDE 2.x)
+## Arduino IDE Setup
 
 1. Install Arduino IDE 2.x.
 2. Open `File -> Preferences`.
-3. Add board manager URL:
+3. Add this Boards Manager URL:
    `https://raw.githubusercontent.com/tenbaht/sduino/master/package_sduino_stm8_index.json`
-4. Install STM8 core from Boards Manager.
-5. Open `arduino_lipo_charger.ino`.
-6. Select board family containing `STM8S103F3P6`.
-7. Select programmer `ST-LINK V2`.
-8. Use `Sketch -> Upload Using Programmer`.
+4. Open `Tools -> Board -> Boards Manager`, install STM8 core package.
+5. Open sketch file `arduino_lipo_charger.ino`.
+6. In `Tools`, select your STM8 board (example: `STM8S103F3P6`).
+7. Select programmer as ST-Link V2 (name may appear as `STLink`, `STLinkV2`, or similar).
+8. Use `Sketch -> Upload Using Programmer` (Ctrl+Shift+U).
 
-ST-LINK wiring:
+## ST-Link Wiring
 
-- `SWIM` -> `SWIM`
-- `GND` -> `GND`
-- `NRST` -> `NRST` (recommended)
-- `3V3/5V` -> target VCC as required
+- ST-Link `SWIM` -> STM8 `SWIM`
+- ST-Link `GND` -> STM8 `GND`
+- ST-Link `3V3/5V` -> target VCC (as required by board)
+- Optional: ST-Link `RST` -> STM8 `NRST`
 
-Full guide: [`Docs/programming_stlink.md`](Docs/programming_stlink.md)
+## Pin Mapping In Sketch
 
-## Safety Notes
+- `PB4`: mains detect input
+- `PD3`: boost enable / Q3 gate driver control
+- `PD4`: buzzer output
+- `PC5`: status LED output
+- `A2` or `PD2`: battery ADC input
 
-- This is a development reference design, not a certified charger.
-- Verify ADC scaling and calibration before connecting real batteries.
-- Use a protected Li-Po cell or external protection circuit.
-- Validate with a dummy load before field deployment.
+If your board mapping differs, edit pin constants at the top of `arduino_lipo_charger.ino`.
 
-## License
+## Threshold Tuning
 
-- Firmware/code: MIT (see [`LICENSE`](LICENSE))
-- Hardware documentation and design files: CERN-OHL-S-2.0 (see [`LICENSE-HARDWARE.md`](LICENSE-HARDWARE.md))
+Edit values in sketch:
+
+- `BATT_CUTOFF_MV` (default `6400`)
+- `BATT_RECOVER_MV` (default `7000`)
+- `LOOP_DELAY_MS`

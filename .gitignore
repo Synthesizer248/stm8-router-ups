@@ -1,30 +1,13 @@
-# Firmware build outputs
+# Arduino build outputs
 build/
 *.hex
 *.elf
 *.lst
 *.eep
-*.map
 
-# Arduino IDE / CLI
+# Arduino IDE metadata
 .arduinoIDE/
 *.ino.eep
-.cache/
 
-# KiCad generated and backup files
-*.kicad_prl
-*.kicad_pro-bak
-*.kicad_sch-bak
-*.kicad_pcb-bak
-*.dsn
-*.ses
-*.gbr
-*.drl
-*.zip
-_autosave-*
-fp-info-cache
-
-# OS/editor noise
-.DS_Store
-Thumbs.db
+# VS Code
 .vscode/*.log

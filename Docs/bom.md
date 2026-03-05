@@ -1,8 +1,57 @@
-# Deprecated File
+# BOM And Pin Map
 
-This BOM file belonged to a previous UPS project and is kept only for backward compatibility.
+## 1) Core Modules
 
-Current solar charger BOM files are:
+- STM8S103F3 development board (1x)
+- 2S Li-ion BMS board, continuous current >= router load (1x)
+- 2S charger module (8.4V CC/CV), input 12V (1x)
+- Boost converter 6V-8.4V to 12V, >=2A recommended (1x)
+- P-channel MOSFET for adapter ideal-diode path `Q1` (1x)
+- P-channel MOSFET for boost ideal-diode path `Q2` (1x)
+- P-channel MOSFET for battery-to-boost switch `Q3` (1x)
+- Small NPN/N-MOS gate driver for Q3 gate control from STM8 `PD3` (1x)
+- 18650 cells (2x, same model/capacity/age)
+- Cell holder for 2S pack or welded pack (1x)
 
-- `hardware/bom/bom.csv`
-- `hardware/bom/bom.md`
+## 2) Sensing/Control Components
+
+- Resistor 100k 1% (battery divider top) (1x)
+- Resistor 33k 1% (battery divider bottom) (1x)
+- Optocoupler PC817 or equivalent (optional, mains detect) (1x)
+- Resistors for optocoupler LED/transistor side (2x to 3x)
+- Active buzzer 3.3V/5V or passive buzzer + driver transistor (1x)
+- LED + 330R resistor (status) (1x each)
+
+## 3) Protection/Power Parts
+
+- Inline fuse holder + fuse (battery positive) (1x)
+- Terminal blocks / screw connectors (as required)
+- Wires rated for expected current
+- Gate resistors/pull-ups for MOSFET control network (as required)
+
+## 4) STM8 Pin Mapping Table
+
+| Function | STM8 Pin | Direction | Connected To |
+|---|---|---|---|
+| Mains present | PB4 | Input | Optocoupler/transistor output |
+| Boost/MOSFET control | PD3 | Output | Q3 gate driver and/or boost `EN` |
+| Buzzer | PD4 | Output | Buzzer input/driver |
+| Status LED | PC5 | Output | LED + resistor |
+| Battery ADC | PD2 / AIN2 | Input (ADC) | Divider midpoint (100k/33k) |
+| Ground | GND | - | Common ground |
+
+## 5) Suggested Ratings (for typical 12V router)
+
+- Router load assumption: up to 1A at 12V
+- Adapter: 12V, 2A or higher
+- Boost converter: 12V, 2A output capability
+- Charger current: 0.8A to 1A (depends on cell spec/thermal)
+
+## 6) Pre-Power Checklist
+
+- Confirm common ground across all modules.
+- Confirm battery polarity and BMS wiring.
+- Confirm divider output at ADC pin is < MCU analog max.
+- Confirm MOSFET source/drain orientation and body diode direction.
+- Confirm boost output is regulated to router requirement.
+- Test no-load then dummy-load before router.

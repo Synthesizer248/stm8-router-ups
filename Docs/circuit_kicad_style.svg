@@ -1,66 +1,150 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="760" viewBox="0 0 1280 760">
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="980" viewBox="0 0 1600 980">
   <defs>
+    <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+      <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#e7ecf2" stroke-width="1"/>
+    </pattern>
+    <marker id="arrow" markerWidth="12" markerHeight="8" refX="10" refY="4" orient="auto">
+      <path d="M 0 0 L 12 4 L 0 8 z" fill="#1f2937"/>
+    </marker>
     <style>
-      .box { fill:#f8fbf2; stroke:#214d2a; stroke-width:2; }
-      .pow { fill:#fff6e8; stroke:#915900; stroke-width:2; }
-      .mcu { fill:#eef4ff; stroke:#1c4d99; stroke-width:2; }
-      .sig { stroke:#1f2937; stroke-width:2; fill:none; }
-      .txt { font-family:Arial, sans-serif; font-size:18px; fill:#111827; }
-      .title { font-family:Arial, sans-serif; font-size:28px; font-weight:700; fill:#111827; }
+      .title { font: 700 28px 'Segoe UI', Arial, sans-serif; fill: #0f172a; }
+      .sub { font: 600 16px 'Segoe UI', Arial, sans-serif; fill: #1f2937; }
+      .txt { font: 14px 'Consolas', 'Courier New', monospace; fill: #111827; }
+      .small { font: 12px 'Consolas', 'Courier New', monospace; fill: #374151; }
+      .blk { fill: #ffffff; stroke: #111827; stroke-width: 2; rx: 8; ry: 8; }
+      .mod { fill: #f8fafc; stroke: #0f172a; stroke-width: 2; rx: 8; ry: 8; }
+      .wire { stroke: #1f2937; stroke-width: 3; fill: none; marker-end: url(#arrow); }
+      .sig { stroke: #0f766e; stroke-width: 2.5; fill: none; marker-end: url(#arrow); }
+      .gnd { stroke: #475569; stroke-width: 2.5; fill: none; }
+      .rail { stroke: #111827; stroke-width: 4; fill: none; }
+      .accent { fill: #dbeafe; stroke: #1d4ed8; stroke-width: 2; rx: 6; ry: 6; }
+      .mcu { fill: #eef2ff; stroke: #4338ca; stroke-width: 2; rx: 10; ry: 10; }
     </style>
   </defs>
 
-  <rect x="0" y="0" width="1280" height="760" fill="#ffffff"/>
-  <text x="40" y="48" class="title">Smart Solar Li-Po Charger (STM8S103F3P6)</text>
+  <rect x="0" y="0" width="1600" height="980" fill="url(#grid)"/>
+  <text x="40" y="48" class="title">STM8 Router UPS Schematic (KiCad-style block drawing)</text>
+  <text x="40" y="74" class="small">Topology: 2S Li-ion + BMS + charger + boost, with Q1/Q2 ideal-diode P-MOS and Q3 controlled battery switch</text>
 
-  <rect x="40" y="120" width="190" height="90" class="pow"/>
-  <text x="62" y="172" class="txt">J1 Solar 5V/200mA</text>
+  <!-- Adapter path -->
+  <rect x="60" y="120" width="190" height="85" class="blk"/>
+  <text x="78" y="154" class="sub">12V Adapter</text>
+  <text x="78" y="178" class="txt">+12V / GND</text>
 
-  <rect x="280" y="110" width="220" height="110" class="pow"/>
-  <text x="310" y="145" class="txt">D1 SS14 + C1 220uF</text>
-  <text x="330" y="180" class="txt">Input Front-End</text>
+  <rect x="365" y="120" width="235" height="85" class="accent"/>
+  <text x="388" y="153" class="sub">Q1 P-MOS</text>
+  <text x="388" y="178" class="txt">Ideal-diode path A</text>
 
-  <rect x="560" y="80" width="280" height="170" class="pow"/>
-  <text x="604" y="122" class="txt">Buck Power Stage</text>
-  <text x="588" y="156" class="txt">Q1 AO3400 + L1 22uH</text>
-  <text x="606" y="190" class="txt">D2 SS14 + C2 470uF</text>
+  <!-- Charger -->
+  <rect x="60" y="270" width="230" height="95" class="mod"/>
+  <text x="80" y="305" class="sub">2S Charger Module</text>
+  <text x="80" y="329" class="txt">8.4V CC/CV</text>
+  <text x="80" y="351" class="small">IN: 12V, OUT: P+/P-</text>
 
-  <rect x="910" y="120" width="260" height="90" class="pow"/>
-  <text x="946" y="172" class="txt">J2 Li-Po 3.7V / 4.2V</text>
+  <!-- BMS + battery -->
+  <rect x="360" y="265" width="260" height="130" class="mod"/>
+  <text x="382" y="300" class="sub">2S BMS Board</text>
+  <text x="382" y="324" class="txt">B+/B- (cells), P+/P- (load/charger)</text>
+  <text x="382" y="349" class="small">Protection: OV, UV, OC</text>
 
-  <rect x="560" y="340" width="300" height="230" class="mcu"/>
-  <text x="616" y="382" class="txt">STM8S103F3P6</text>
-  <text x="598" y="414" class="txt">PWM + ADC + Safety</text>
-  <text x="592" y="446" class="txt">SWIM Programming</text>
+  <rect x="60" y="430" width="245" height="95" class="blk"/>
+  <text x="80" y="466" class="sub">2x 18650 Cells (2S)</text>
+  <text x="80" y="492" class="txt">to BMS B+ / B-</text>
 
-  <rect x="280" y="330" width="220" height="110" class="box"/>
-  <text x="322" y="370" class="txt">Solar Divider</text>
-  <text x="338" y="402" class="txt">R1/R2 -> ADC</text>
+  <!-- Fuse + Q3 + boost -->
+  <rect x="705" y="300" width="90" height="55" class="blk"/>
+  <text x="734" y="333" class="txt">Fuse</text>
 
-  <rect x="280" y="500" width="220" height="110" class="box"/>
-  <text x="316" y="540" class="txt">Battery Divider</text>
-  <text x="338" y="572" class="txt">R3/R4 -> ADC</text>
+  <rect x="835" y="285" width="220" height="85" class="accent"/>
+  <text x="857" y="320" class="sub">Q3 P-MOS Switch</text>
+  <text x="857" y="344" class="txt">Battery -> Boost IN</text>
 
-  <rect x="910" y="320" width="260" height="120" class="box"/>
-  <text x="956" y="364" class="txt">Current Sense</text>
-  <text x="942" y="398" class="txt">R5 0.1R + U2 (opt)</text>
+  <rect x="1090" y="270" width="220" height="115" class="mod"/>
+  <text x="1110" y="305" class="sub">Boost Converter</text>
+  <text x="1110" y="329" class="txt">6-8.4V -> 12V</text>
+  <text x="1110" y="352" class="small">EN controllable</text>
 
-  <rect x="910" y="500" width="260" height="90" class="box"/>
-  <text x="966" y="550" class="txt">J3 SWIM Header</text>
+  <rect x="1110" y="430" width="210" height="85" class="accent"/>
+  <text x="1132" y="463" class="sub">Q2 P-MOS</text>
+  <text x="1132" y="487" class="txt">Ideal-diode path B</text>
 
-  <path d="M230 165 L280 165" class="sig"/>
-  <path d="M500 165 L560 165" class="sig"/>
-  <path d="M840 165 L910 165" class="sig"/>
+  <!-- Output rail and router -->
+  <path d="M 1360 168 L 1490 168" class="rail"/>
+  <text x="1362" y="150" class="txt">UPS_12V_OUT</text>
 
-  <path d="M670 250 L670 340" class="sig"/>
-  <path d="M500 385 L560 385" class="sig"/>
-  <path d="M500 555 L560 555" class="sig"/>
-  <path d="M910 380 L860 380" class="sig"/>
-  <path d="M910 545 L860 545" class="sig"/>
+  <rect x="1410" y="120" width="165" height="85" class="blk"/>
+  <text x="1430" y="154" class="sub">Router</text>
+  <text x="1430" y="178" class="txt">12V DC IN</text>
 
-  <text x="705" y="300" class="txt">PWM_GATE</text>
-  <text x="510" y="370" class="txt">ADC_SOLAR</text>
-  <text x="510" y="540" class="txt">ADC_BATT</text>
-  <text x="865" y="365" class="txt">ADC_CURR</text>
-  <text x="864" y="530" class="txt">SWIM/NRST</text>
+  <!-- STM8 + regulator -->
+  <rect x="1265" y="610" width="190" height="85" class="blk"/>
+  <text x="1284" y="645" class="sub">Regulator</text>
+  <text x="1284" y="669" class="txt">UPS -> 5V/3.3V</text>
+
+  <rect x="970" y="600" width="260" height="210" class="mcu"/>
+  <text x="993" y="632" class="sub">STM8S103 Module</text>
+  <text x="993" y="660" class="txt">PB4  : Adapter detect</text>
+  <text x="993" y="684" class="txt">PD2  : Battery ADC</text>
+  <text x="993" y="708" class="txt">PD3  : Q3 gate / Boost EN</text>
+  <text x="993" y="732" class="txt">PD4  : Buzzer</text>
+  <text x="993" y="756" class="txt">PC5  : Status LED</text>
+  <text x="993" y="780" class="txt">VCC, GND</text>
+
+  <rect x="805" y="610" width="120" height="70" class="blk"/>
+  <text x="826" y="639" class="txt">Buzzer</text>
+  <text x="826" y="661" class="small">(optional)</text>
+
+  <rect x="805" y="715" width="120" height="70" class="blk"/>
+  <text x="836" y="747" class="txt">LED</text>
+  <text x="821" y="769" class="small">+330R</text>
+
+  <!-- Main power wires -->
+  <path d="M 250 162 L 365 162" class="wire"/>
+  <path d="M 600 162 L 1360 162" class="wire"/>
+  <path d="M 1490 168 L 1410 168" class="wire"/>
+
+  <path d="M 250 162 L 250 318 L 290 318" class="wire"/>
+  <path d="M 290 318 L 360 318" class="wire"/>
+  <path d="M 305 478 L 360 340" class="wire"/>
+
+  <path d="M 620 318 L 705 328" class="wire"/>
+  <path d="M 795 328 L 835 328" class="wire"/>
+  <path d="M 1055 328 L 1090 328" class="wire"/>
+  <path d="M 1200 385 L 1200 430" class="wire"/>
+  <path d="M 1320 472 L 1360 168" class="wire"/>
+
+  <!-- Ground bus -->
+  <path d="M 60 560 L 1510 560" class="gnd"/>
+  <text x="62" y="552" class="small">GND BUS</text>
+  <path d="M 155 205 L 155 560" class="gnd"/>
+  <path d="M 170 365 L 170 560" class="gnd"/>
+  <path d="M 490 395 L 490 560" class="gnd"/>
+  <path d="M 1160 385 L 1160 560" class="gnd"/>
+  <path d="M 1210 515 L 1210 560" class="gnd"/>
+  <path d="M 1490 205 L 1490 560" class="gnd"/>
+  <path d="M 1080 810 L 1080 560" class="gnd"/>
+  <path d="M 1340 695 L 1340 560" class="gnd"/>
+
+  <!-- Control/signal wires -->
+  <path d="M 1230 705 L 835 360" class="sig"/>
+  <text x="940" y="512" class="small">PD3 -> Q3 gate driver / Boost EN</text>
+
+  <path d="M 1230 650 L 260 162" class="sig"/>
+  <text x="735" y="395" class="small">PB4 &lt;- adapter detect divider/opto</text>
+
+  <path d="M 970 684 L 620 330" class="sig"/>
+  <text x="785" y="575" class="small">PD2 &lt;- battery divider 100k/33k from BMS P+</text>
+
+  <path d="M 970 732 L 925 646" class="sig"/>
+  <path d="M 970 756 L 925 750" class="sig"/>
+
+  <path d="M 1360 168 L 1360 610 L 1265 650" class="wire"/>
+  <text x="1298" y="590" class="small">Power MCU via regulator</text>
+
+  <!-- Legend -->
+  <rect x="60" y="850" width="1490" height="95" class="mod"/>
+  <text x="84" y="880" class="sub">Legend / Build Notes</text>
+  <text x="84" y="904" class="txt">Q1/Q2 are ideal-diode P-MOS stages for automatic source OR-ing. Q3 is STM8-controlled battery switch.</text>
+  <text x="84" y="926" class="txt">Keep BMS terminal mapping strict: cells on B+/B-, system load/charge on P+/P-. Add fuse in battery positive path.</text>
 </svg>
