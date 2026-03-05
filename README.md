@@ -10,6 +10,14 @@ Open-source reference design for a microcontroller-controlled solar charger:
 
 This repository includes firmware, circuit design, PCB design files, BOM, and bring-up/testing docs.
 
+## About
+
+STM8-based open-source smart solar charger for `5V/200mA` panels and `1S Li-Po` batteries, with PWM buck control, Li-Po safety state machine, and lightweight MPPT.
+
+## Tags
+
+`stm8` `stm8duino` `solar-charger` `mppt` `lipo-charger` `buck-converter` `embedded` `open-hardware` `st-link`
+
 ## Features
 
 - Solar voltage monitoring (`ADC`)
